@@ -43,6 +43,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    private Boolean isVerifiedHost = false;
+
+    private Boolean emailVerified = false;
+    private String verificationOtp;
+    private java.time.LocalDateTime otpExpiryTime;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

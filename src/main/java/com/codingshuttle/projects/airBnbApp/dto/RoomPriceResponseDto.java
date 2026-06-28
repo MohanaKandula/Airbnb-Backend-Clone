@@ -15,4 +15,9 @@ public class RoomPriceResponseDto {
     private String[] photos;
     private String[] amenities;
     private Double price;
+    private Double basePrice;
+    private Double surgeFactor;
+    private Boolean isHoliday;
+    private Double occupancyRate;
+    private String pricingLabel;
 }

@@ -25,6 +25,10 @@ public class Hotel {
 
     private String city;
 
+    private String state;
+
+    private Double rating;
+
     @Column(columnDefinition = "TEXT[]")
     private String[] photos;
 
@@ -45,6 +49,9 @@ public class Hotel {
 
     @ManyToOne(optional = false)
     private User owner;
+
+    private Double latitude;
+    private Double longitude;
 
     @OneToMany(mappedBy = "hotel")
     @JsonIgnore

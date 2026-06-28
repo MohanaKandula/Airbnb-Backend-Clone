@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +40,12 @@ public class InventoryServiceImpl implements InventoryService{
     private final HotelMinPriceRepository hotelMinPriceRepository;
 
     @Override
+    @Transactional
+    @CacheEvict(value = "hotelSearch", allEntries = true)
     public void initializeRoomForAYear(Room room) {
         LocalDate today = LocalDate.now();
         LocalDate endDate = today.plusYears(1);
+        List<Inventory> inventories = new java.util.ArrayList<>();
         for (; !today.isAfter(endDate); today=today.plusDays(1)) {
             Inventory inventory = Inventory.builder()
                     .hotel(room.getHotel())
@@ -54,17 +59,20 @@ public class InventoryServiceImpl implements InventoryService{
                     .totalCount(room.getTotalCount())
                     .closed(false)
                     .build();
-            inventoryRepository.save(inventory);
+            inventories.add(inventory);
         }
+        inventoryRepository.saveAll(inventories);
     }
 
     @Override
+    @CacheEvict(value = "hotelSearch", allEntries = true)
     public void deleteAllInventories(Room room) {
         log.info("Deleting the inventories of room with id: {}", room.getId());
         inventoryRepository.deleteByRoom(room);
     }
 
     @Override
+    @Cacheable(value = "hotelSearch", key = "#hotelSearchRequest.toString()", unless = "#result == null")
     public Page<HotelPriceResponseDto> searchHotels(HotelSearchRequest hotelSearchRequest) {
         log.info("Searching hotels for {} city, from {} to {}", hotelSearchRequest.getCity(), hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate());
         Pageable pageable = PageRequest.of(hotelSearchRequest.getPage(), hotelSearchRequest.getSize());
@@ -102,6 +110,7 @@ public class InventoryServiceImpl implements InventoryService{
 
     @Override
     @Transactional
+    @CacheEvict(value = "hotelSearch", allEntries = true)
     public void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto) {
         log.info("Updating All inventory by room for room with id: {} between date range: {} - {}", roomId,
                 updateInventoryRequestDto.getStartDate(), updateInventoryRequestDto.getEndDate());

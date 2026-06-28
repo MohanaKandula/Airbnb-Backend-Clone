@@ -16,10 +16,23 @@ public interface HotelMinPriceRepository extends JpaRepository<HotelMinPrice, Lo
 
     @Query("""
             SELECT new com.codingshuttle.projects.airBnbApp.dto.HotelPriceDto(i.hotel, AVG(i.price))
-            FROM HotelMinPrice i
-            WHERE i.hotel.city = :city
-                AND i.date BETWEEN :startDate AND :endDate
+            FROM Inventory i
+            WHERE (LOWER(i.hotel.city) = LOWER(:city) OR LOWER(i.hotel.state) = LOWER(:city))
                 AND i.hotel.active = true
+                AND i.closed = false
+                AND i.date BETWEEN :startDate AND :endDate
+                AND (i.totalCount - i.bookedCount - i.reservedCount) >= :roomsCount
+                AND i.room.id IN (
+                    SELECT available.room.id
+                    FROM Inventory available
+                    WHERE (LOWER(available.hotel.city) = LOWER(:city) OR LOWER(available.hotel.state) = LOWER(:city))
+                        AND available.hotel.active = true
+                        AND available.closed = false
+                        AND available.date BETWEEN :startDate AND :endDate
+                        AND (available.totalCount - available.bookedCount - available.reservedCount) >= :roomsCount
+                    GROUP BY available.room.id
+                    HAVING COUNT(DISTINCT available.date) = :dateCount
+                )
            GROUP BY i.hotel
            """)
     Page<HotelPriceDto> findHotelsWithAvailableInventory(
@@ -32,4 +45,6 @@ public interface HotelMinPriceRepository extends JpaRepository<HotelMinPrice, Lo
     );
 
     Optional<HotelMinPrice> findByHotelAndDate(Hotel hotel, LocalDate date);
+
+    java.util.List<HotelMinPrice> findByHotelAndDateBetween(Hotel hotel, java.time.LocalDate startDate, java.time.LocalDate endDate);
 }

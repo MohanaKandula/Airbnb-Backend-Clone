@@ -38,8 +38,23 @@ public class GuestServiceImpl implements GuestService {
     public GuestDto addNewGuest(GuestDto guestDto) {
         log.info("Adding new guest: {}", guestDto);
         User user = getCurrentUser();
+
+        if (Boolean.TRUE.equals(guestDto.getIsPrimary())) {
+            List<Guest> existingGuests = guestRepository.findByUser(user);
+            for (Guest g : existingGuests) {
+                if (Boolean.TRUE.equals(g.getIsPrimary())) {
+                    g.setIsPrimary(false);
+                    guestRepository.save(g);
+                }
+            }
+        }
+
         Guest guest = modelMapper.map(guestDto, Guest.class);
         guest.setUser(user);
+        if (guest.getIsPrimary() == null) {
+            guest.setIsPrimary(false);
+        }
+
         Guest savedGuest = guestRepository.save(guest);
         log.info("Guest added with ID: {}", savedGuest.getId());
         return modelMapper.map(savedGuest, GuestDto.class);
@@ -54,9 +69,22 @@ public class GuestServiceImpl implements GuestService {
         User user = getCurrentUser();
         if(!user.equals(guest.getUser())) throw new AccessDeniedException("You are not the owner of this guest");
 
+        if (Boolean.TRUE.equals(guestDto.getIsPrimary())) {
+            List<Guest> existingGuests = guestRepository.findByUser(user);
+            for (Guest g : existingGuests) {
+                if (!g.getId().equals(guestId) && Boolean.TRUE.equals(g.getIsPrimary())) {
+                    g.setIsPrimary(false);
+                    guestRepository.save(g);
+                }
+            }
+        }
+
         modelMapper.map(guestDto, guest);
         guest.setUser(user);
         guest.setId(guestId);
+        if (guest.getIsPrimary() == null) {
+            guest.setIsPrimary(false);
+        }
 
         guestRepository.save(guest);
         log.info("Guest with ID: {} updated successfully", guestId);

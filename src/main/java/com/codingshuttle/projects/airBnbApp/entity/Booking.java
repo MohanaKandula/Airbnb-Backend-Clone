@@ -1,6 +1,7 @@
 package com.codingshuttle.projects.airBnbApp.entity;
 
 import com.codingshuttle.projects.airBnbApp.entity.enums.BookingStatus;
+import com.codingshuttle.projects.airBnbApp.entity.enums.PayoutStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -68,4 +69,12 @@ public class Booking {
     @Column(unique = true)
     private String paymentSessionId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    @Builder.Default
+    private PayoutStatus payoutStatus = PayoutStatus.HELD_IN_ESCROW;
+
+    private Integer rating;
+
 }
+

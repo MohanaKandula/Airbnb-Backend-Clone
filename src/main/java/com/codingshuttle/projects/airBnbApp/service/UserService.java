@@ -11,4 +11,8 @@ public interface UserService {
     void updateProfile(ProfileUpdateRequestDto profileUpdateRequestDto);
 
     UserDto getMyProfile();
+
+    UserDto verifyHost();
+
+    void deleteMyAccount();
 }

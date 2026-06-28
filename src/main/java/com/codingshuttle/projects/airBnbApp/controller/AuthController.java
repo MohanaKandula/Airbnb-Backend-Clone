@@ -4,6 +4,8 @@ import com.codingshuttle.projects.airBnbApp.dto.LoginDto;
 import com.codingshuttle.projects.airBnbApp.dto.LoginResponseDto;
 import com.codingshuttle.projects.airBnbApp.dto.SignUpRequestDto;
 import com.codingshuttle.projects.airBnbApp.dto.UserDto;
+import com.codingshuttle.projects.airBnbApp.dto.VerifyEmailDto;
+import com.codingshuttle.projects.airBnbApp.dto.ResendOtpDto;
 import com.codingshuttle.projects.airBnbApp.security.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
@@ -56,6 +58,20 @@ public class AuthController {
 
         String accessToken = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(new LoginResponseDto(accessToken));
+    }
+
+    @PostMapping("/verify")
+    @Operation(summary = "Verify user account email with OTP", tags = {"Auth"})
+    public ResponseEntity<Void> verify(@RequestBody VerifyEmailDto verifyEmailDto) {
+        authService.verifyOtp(verifyEmailDto.getEmail(), verifyEmailDto.getOtp());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/resend-otp")
+    @Operation(summary = "Resend OTP code to user email", tags = {"Auth"})
+    public ResponseEntity<Void> resendOtp(@RequestBody ResendOtpDto resendOtpDto) {
+        authService.resendOtp(resendOtpDto.getEmail());
+        return ResponseEntity.ok().build();
     }
 
 }

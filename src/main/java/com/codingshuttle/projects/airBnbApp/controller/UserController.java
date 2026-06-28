@@ -71,4 +71,17 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/verify-host")
+    @Operation(summary = "Verify the logged-in user as a trusted host", tags = {"Profile"})
+    public ResponseEntity<UserDto> verifyHost() {
+        return ResponseEntity.ok(userService.verifyHost());
+    }
+
+    @DeleteMapping("/profile")
+    @Operation(summary = "Delete/Anonymize the logged-in user account", tags = {"Profile"})
+    public ResponseEntity<Void> deleteMyAccount() {
+        userService.deleteMyAccount();
+        return ResponseEntity.noContent().build();
+    }
+
 }

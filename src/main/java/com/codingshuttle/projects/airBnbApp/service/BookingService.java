@@ -30,4 +30,15 @@ public interface BookingService {
     HotelReportDto getHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate);
 
     List<BookingDto> getMyBookings();
+
+    BookingDto getBookingDetails(Long bookingId);
+
+    BookingDto rateBooking(Long bookingId, Integer ratingValue);
+
+    BookingDto selectCashPaymentMethod(Long bookingId);
+
+    BookingDto confirmCashPayment(Long bookingId);
+
+    boolean hasActiveCashBooking(Long userId);
 }
+

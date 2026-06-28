@@ -12,4 +12,6 @@ public class GuestDto {
     private String name;
     private Gender gender;
     private LocalDate dateOfBirth;
+    private Integer age;
+    private Boolean isPrimary;
 }

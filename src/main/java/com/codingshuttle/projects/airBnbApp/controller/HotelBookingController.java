@@ -49,4 +49,40 @@ public class HotelBookingController {
     public ResponseEntity<BookingStatusResponseDto> getBookingStatus(@PathVariable Long bookingId) {
         return ResponseEntity.ok(new BookingStatusResponseDto(bookingService.getBookingStatus(bookingId)));
     }
+
+    @GetMapping("/{bookingId}")
+    @Operation(summary = "Get the details of the booking", tags = {"Booking Flow"})
+    public ResponseEntity<BookingDto> getBookingDetails(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(bookingService.getBookingDetails(bookingId));
+    }
+
+    @PostMapping("/{bookingId}/rate")
+    @Operation(summary = "Rate a stay / hotel from a booking", tags = {"Booking Flow"})
+    public ResponseEntity<BookingDto> rateBooking(@PathVariable Long bookingId,
+                                                  @RequestBody java.util.Map<String, Integer> ratingMap) {
+        Integer rating = ratingMap.get("rating");
+        if (rating == null || rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
+        return ResponseEntity.ok(bookingService.rateBooking(bookingId, rating));
+    }
+
+    @PostMapping("/{bookingId}/cash")
+    @Operation(summary = "Select cash payment method at property", tags = {"Booking Flow"})
+    public ResponseEntity<BookingDto> selectCashPaymentMethod(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(bookingService.selectCashPaymentMethod(bookingId));
+    }
+
+    @PostMapping("/{bookingId}/confirm-cash")
+    @Operation(summary = "Host manager confirms physical cash payment", tags = {"Booking Flow"})
+    public ResponseEntity<BookingDto> confirmCashPayment(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(bookingService.confirmCashPayment(bookingId));
+    }
+
+    @GetMapping("/has-active-cash")
+    @Operation(summary = "Check if user has an active pending cash booking", tags = {"Booking Flow"})
+    public ResponseEntity<Boolean> hasActiveCashBooking() {
+        return ResponseEntity.ok(bookingService.hasActiveCashBooking(com.codingshuttle.projects.airBnbApp.util.AppUtils.getCurrentUser().getId()));
+    }
 }
+

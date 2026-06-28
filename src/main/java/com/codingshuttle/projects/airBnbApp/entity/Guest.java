@@ -31,6 +31,8 @@ public class Guest {
 
     private LocalDate dateOfBirth;
 
+    private Boolean isPrimary = false;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

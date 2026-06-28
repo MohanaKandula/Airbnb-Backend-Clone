@@ -12,6 +12,7 @@ public class HotelPriceResponseDto {
     private Long id;
     private String name;
     private String city;
+    private Double rating;
     private String[] photos;
     private String[] amenities;
     private HotelContactInfo contactInfo;
